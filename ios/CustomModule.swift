@@ -12,27 +12,28 @@ class CustomModule: NSObject, RCTBridgeModule {
         DispatchQueue.main.async {
             let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default))
-            
+
             UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true)
         }
     }
 
-    @objc func showBlueView(_ callback: @escaping RCTResponseSenderBlock) {
-        DispatchQueue.main.async {
-            let blueViewController = BlueViewController()
+  @objc func showBlueView(_ callback: @escaping RCTResponseSenderBlock) {
+      DispatchQueue.main.async {
+          let blueViewController = BlueViewController()
+          blueViewController.modalPresentationStyle = .fullScreen
 
-            // Get the current root view controller to present the blue view controller
-            if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController {
-                rootViewController.present(blueViewController, animated: true) {
-                    // Call the callback with success once the modal presentation is completed
-                    callback([NSNull(), true]) // Success callback
-                }
-            } else {
-                // Call the callback with an error message if modal presentation fails
-                callback(["Error presenting blue view.", NSNull()]) // Error callback
-            }
-        }
-    }
+          // Get the current root view controller to present the blue view controller
+          if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController {
+              blueViewController.dismissCallback = {
+                  callback([NSNull(), true]) // Success callback when dismissed
+              }
+              rootViewController.present(blueViewController, animated: true, completion: nil)
+          } else {
+              // Call the callback with an error message if modal presentation fails
+              callback(["Error presenting blue view.", NSNull()]) // Error callback
+          }
+      }
+  }
 
     // Export methods to JavaScript
     @objc
